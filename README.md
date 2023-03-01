@@ -1,4 +1,4 @@
-# MMTK - Multimedia Storage Analysis Toolkit
+# MSAT - Multimedia Storage Analysis Toolkit
 
 A toolkit to analyze the changes in storage requirements of multimedia objects as different
 parameters are changed by up/down sizing/scaling/etc.
