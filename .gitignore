@@ -1,1 +1,8 @@
 *.pyc
+
+# default output directory
+out/
+
+# huge images. it contains the contents of the
+# SRC folder of the SAMPLING archive
+media/testimages.org/

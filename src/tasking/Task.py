@@ -13,5 +13,5 @@ class Task(ABC):
         pass
 
     @abstractmethod
-    def run(self):
+    def run(self, image_name: str):
         pass

@@ -1,7 +1,10 @@
+import shutil
 from argparse import ArgumentParser
 
+from config.Config import config
 from file_utils.filecollection import FileCollection
-from file_utils.utils import create_output_dir
+from file_utils.utils import create_output_dir_if_needed
+from tasking.ImageResizeTask import ImageResizeTask
 
 
 def parse_args():
@@ -20,12 +23,27 @@ def parse_args():
                         help="Override the output directory for files created by "
                              "the program (SQLite DB, working files, etc.).")
 
+    parser.add_argument('-c', '--clean',
+                        action="store_true",
+                        help="Clean out the output directory.")
+
     return parser.parse_args()
 
 
-if __name__ == '__main__':
+def main():
     args = parse_args()
-    files = FileCollection(args.mediadir)
-    create_output_dir(args.outputdir)
+    config.update(**args.__dict__)
 
-    files.keep_files_with_ending_in()
+    if args.clean:
+        shutil.rmtree(args.outputdir)
+        return
+
+    files = FileCollection(args.mediadir)
+    create_output_dir_if_needed(args.outputdir)
+
+    for file in files:
+        ImageResizeTask().run(file)
+
+
+if __name__ == '__main__':
+    main()

@@ -18,7 +18,7 @@ class FileCollection:
             raise StopIteration
 
     @staticmethod
-    def from_filename_list(filename_list: list[str]):
+    def from_filename_list(filename_list: list[str]) -> "FileCollection":
         collection = FileCollection('.')
         collection.file_list = filename_list
         return collection
@@ -54,11 +54,14 @@ class FileCollection:
 
         return file_collection
 
-    def keep_files_with_ending_in(self, allowed_file_endings: tuple[str] = None) -> "FileCollection":
+    def keep_files_with_ending_in(self,
+                                  allowed_file_endings:
+                                  tuple[str] = None) -> "FileCollection":
         """
         Filters filenames according to their file endings.
         One can optionally pass a tuple of file endings to override the default endings,
         which are (jpeg, jpg, png)
+
         """
 
         if allowed_file_endings is None:
