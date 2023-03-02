@@ -1,6 +1,7 @@
 from argparse import ArgumentParser
 
-from file_utils import collect_filenames_in_dir, filter_nonmedia_files, create_output_dir
+from file_utils.filecollection import FileCollection
+from file_utils.utils import create_output_dir
 
 
 def parse_args():
@@ -24,8 +25,7 @@ def parse_args():
 
 if __name__ == '__main__':
     args = parse_args()
-
-    filenames = collect_filenames_in_dir(args.mediadir)
-    print(filter_nonmedia_files(filenames))
-
+    files = FileCollection(args.mediadir)
     create_output_dir(args.outputdir)
+
+    files.keep_files_with_ending_in()
