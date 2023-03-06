@@ -4,7 +4,7 @@ from argparse import ArgumentParser
 from config.Config import config
 from file_utils.filecollection import FileCollection
 from file_utils.utils import create_output_dir_if_needed
-from tasking.ImageResizeTask import ImageResizeTask
+from tasking.ImageScaleTask import ImageScaleTask
 
 
 def parse_args():
@@ -41,8 +41,16 @@ def main():
     files = FileCollection(args.mediadir)
     create_output_dir_if_needed(args.outputdir)
 
+    target_resolutions = [
+        (1000, 1000),
+        (800, 800),
+        (600, 600),
+        (400, 400),
+        (200, 200)
+    ]
+
     for file in files:
-        ImageResizeTask().run(file)
+        ImageScaleTask(file, target_resolutions).run()
 
 
 if __name__ == '__main__':
