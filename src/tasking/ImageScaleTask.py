@@ -46,7 +46,12 @@ class ImageScaleTask(Task):
                 # scale the image
                 log.debug(f"Scaling image {self.image_path} to ({width}, {height}).")
                 scaled_image = image.resize(size=(width, height))
+
                 # and write to the file.
                 output_name = f"{unique_folder_location}{os.sep}" \
                               f"{width}x{height}.{image_format}"
-                scaled_image.save(output_name)
+
+                if scaled_image.format == "JPEG":
+                    scaled_image.save(output_name, quality="keep")
+                else:
+                    scaled_image.save(output_name, optimize=False)

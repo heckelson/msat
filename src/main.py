@@ -1,4 +1,8 @@
+import logging
 import shutil
+
+logging.basicConfig(level=logging.DEBUG)
+
 from argparse import ArgumentParser
 
 from config.Config import config
@@ -38,7 +42,7 @@ def main():
         shutil.rmtree(args.outputdir)
         return
 
-    files = FileCollection(args.mediadir)
+    files = FileCollection(args.mediadir).keep_files_with_ending_in()
     create_output_dir_if_needed(args.outputdir)
 
     target_resolutions = [
