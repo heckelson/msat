@@ -20,7 +20,7 @@ class FileUtilsTests(unittest.TestCase):
             self.assertEqual(my_impl, reference)
 
     def test_can_filter_FileCollections(self):
-        print(self.files.keep_files_with_ending_in(('jpeg',)))
+        print(self.files.keep_relevant_files(('jpeg',)))
 
 
 if __name__ == '__main__':

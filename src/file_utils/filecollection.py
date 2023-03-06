@@ -54,9 +54,9 @@ class FileCollection:
 
         return file_collection
 
-    def keep_files_with_ending_in(self,
-                                  allowed_file_endings:
-                                  tuple[str] = None) -> "FileCollection":
+    def keep_relevant_files(self,
+                            override_file_endings:
+                            tuple[str] = None) -> "FileCollection":
         """
         Filters filenames according to their file endings.
         One can optionally pass a tuple of file endings to override the default endings,
@@ -64,12 +64,12 @@ class FileCollection:
 
         """
 
-        if allowed_file_endings is None:
-            allowed_file_endings = ('jpeg', 'jpg', 'png')
+        if override_file_endings is None:
+            override_file_endings = ('jpeg', 'jpg', 'png')
 
         # this works only with tuples!
         filtered_files = list(filter(
-            lambda file: file.lower().endswith(allowed_file_endings), self.file_list))
+            lambda file: file.lower().endswith(override_file_endings), self.file_list))
 
         # return a new object
         new_collection = FileCollection.from_filename_list(filtered_files)

@@ -1,26 +1,30 @@
 import logging
+import queue
 import shutil
-
-logging.basicConfig(level=logging.DEBUG)
-
 from argparse import ArgumentParser
 
 from config.Config import config
 from file_utils.filecollection import FileCollection
 from file_utils.utils import create_output_dir_if_needed
 from tasking.ImageScaleTask import ImageScaleTask
+from tasking.ImageSizeReportTask import ImageSizeReportTask
+from tasking.TaskQueue import TaskQueue
+
+logging.basicConfig(level=logging.DEBUG)
 
 
 def parse_args():
     parser = ArgumentParser()
     parser.add_argument('-r', '--replace',
                         action="store_true",
-                        help="Replace existing entries in the table.")
+                        help="Replace existing files in the file system as well as "
+                             "database entries, if applicable. Basically redoes all "
+                             "the work.")
 
     parser.add_argument('-m', '--mediadir',
                         default='./media',
-                        help="Override the directory in which the source "
-                             "media is located (Default: './media')")
+                        help="Override the directory in which the source media is "
+                             "located (Default: './media')")
 
     parser.add_argument('-o', '--outputdir',
                         default='./out',
@@ -39,11 +43,15 @@ def main():
     config.update(**args.__dict__)
 
     if args.clean:
+        # if we have the "clean" argument set, remove the output dir and do
+        # nothing else.
         shutil.rmtree(args.outputdir)
         return
 
-    files = FileCollection(args.mediadir).keep_files_with_ending_in()
+    files = FileCollection(args.mediadir).keep_relevant_files()
     create_output_dir_if_needed(args.outputdir)
+
+    task_queue = TaskQueue()
 
     target_resolutions = [
         (1000, 1000),
@@ -54,7 +62,15 @@ def main():
     ]
 
     for file in files:
-        ImageScaleTask(file, target_resolutions).run()
+        task_queue.put(ImageScaleTask(file, target_resolutions))
+
+    task_queue.put(ImageSizeReportTask(args.outputdir))
+
+    try:
+        while task := task_queue.get():
+            task.run()
+    except queue.Empty:
+        pass
 
 
 if __name__ == '__main__':

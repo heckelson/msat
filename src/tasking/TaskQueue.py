@@ -3,6 +3,8 @@ from queue import Queue
 from tasking.Task import Task
 
 
+# TODO: Refactor this to be able to create simple parallel structures, such as
+#  multiple image scalings at once.
 class TaskQueue:
     def __init__(self):
         self.queue = Queue()
