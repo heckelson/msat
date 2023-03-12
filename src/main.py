@@ -3,13 +3,13 @@ import queue
 import shutil
 from argparse import ArgumentParser
 
-from config.Config import config
+from config.config import config
 from file_utils.filecollection import FileCollection
 from file_utils.utils import create_output_dir_if_needed
-from tasking.ImageScaleTask import ImageScaleTask
-from tasking.ImageSizeReportTask import ImageSizeReportTask
-from tasking.ParallelTask import ParallelTask
-from tasking.TaskQueue import TaskQueue
+from tasking.ImageTasks.imagescaletask import ImageScaleTask
+from tasking.ImageTasks.imagesizereporttask import ImageSizeReportTask
+from tasking.paralleltask import ParallelTask
+from tasking.taskqueue import TaskQueue
 
 
 def parse_args():
@@ -47,12 +47,11 @@ def main():
         shutil.rmtree(args.outputdir)
         return
 
-    files = FileCollection(args.mediadir).keep_relevant_files()
+    generated_media_dir = f"{args.outputdir}{os.sep}{config.get('OUTPUT_MEDIA_DIRNAME')}"
 
     # set up dir structure for the outputs
     create_output_dir_if_needed(args.outputdir)
-    create_output_dir_if_needed(f"{args.outputdir}{os.sep}"
-                                f"{config.get('OUTPUT_MEDIA_DIRNAME')}")
+    create_output_dir_if_needed(generated_media_dir)
 
     task_queue = TaskQueue()
 
@@ -64,14 +63,12 @@ def main():
         (200, 200)
     ]
 
+    files = FileCollection(args.mediadir).keep_relevant_files()
     task_queue.put(ParallelTask([
         ImageScaleTask(file, target_resolutions) for file in files
     ]))
 
-    generated_files = FileCollection(f"{args.outputdir}{os.sep}"
-                                     f"{config.get('OUTPUT_MEDIA_DIRNAME')}")
-
-    task_queue.put(ImageSizeReportTask(generated_files))
+    task_queue.put(ImageSizeReportTask(generated_media_dir))
 
     try:
         while task := task_queue.get():

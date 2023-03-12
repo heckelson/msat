@@ -3,9 +3,9 @@ import os
 
 from PIL import Image
 
-from config.Config import config
+from config.config import config
 from file_utils.utils import sha256hash, create_output_dir_if_needed
-from tasking.Task import Task
+from tasking.task import Task
 
 log = logging.getLogger(__name__)
 

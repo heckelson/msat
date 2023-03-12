@@ -1,11 +1,9 @@
 from queue import Queue
 
-from tasking.ParallelTask import ParallelTask
-from tasking.Task import Task
+from tasking.paralleltask import ParallelTask
+from tasking.task import Task
 
 
-# TODO: Refactor this to be able to create simple parallel structures, such as
-#  multiple image scalings at once.
 class TaskQueue:
     def __init__(self):
         self.queue = Queue()

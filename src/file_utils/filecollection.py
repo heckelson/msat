@@ -3,15 +3,15 @@ import os
 
 class FileCollection:
     def __init__(self, starting_dir: str):
-        self.file_list = self.__collect_filenames_in_dir(starting_dir)
+        self.__file_list = self.__collect_filenames_in_dir(starting_dir)
 
     def __iter__(self):
         self.__n = 0
         return self
 
     def __next__(self):
-        if self.__n < len(self.file_list):
-            next_elem = self.file_list[self.__n]
+        if self.__n < len(self.__file_list):
+            next_elem = self.__file_list[self.__n]
             self.__n += 1
             return next_elem
         else:
@@ -20,7 +20,7 @@ class FileCollection:
     @staticmethod
     def from_filename_list(filename_list: list[str]) -> "FileCollection":
         collection = FileCollection('.')
-        collection.file_list = filename_list
+        collection.__file_list = filename_list
         return collection
 
     @staticmethod
@@ -69,11 +69,11 @@ class FileCollection:
 
         # this works only with tuples!
         filtered_files = list(filter(
-            lambda file: file.lower().endswith(override_file_endings), self.file_list))
+            lambda file: file.lower().endswith(override_file_endings), self.__file_list))
 
         # return a new object
         new_collection = FileCollection.from_filename_list(filtered_files)
         return new_collection
 
     def __repr__(self):
-        return str(self.file_list)
+        return str(sorted(self.__file_list))

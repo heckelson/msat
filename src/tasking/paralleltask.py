@@ -1,7 +1,7 @@
 import logging
 from multiprocessing import Pool
 
-from tasking.Task import Task
+from tasking.task import Task
 
 log = logging.getLogger(__name__)
 
