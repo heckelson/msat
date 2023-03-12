@@ -46,13 +46,15 @@ class ImageScaleTask(Task):
             for res in self.target_resolutions:
                 width, height = res
 
-                # scale the image...
-                log.debug(f"Scaling image {self.image_path} to ({width}, {height}).")
-                scaled_image = image.resize(size=(width, height))
-
-                # ...and write to the file.
                 output_name = f"{unique_folder_location}{os.sep}" \
                               f"{width}x{height}.{image_format}"
+
+                if os.path.exists(output_name) and os.path.isfile(output_name):
+                    log.warning(f"Skipping already existing file :`{output_name}`")
+                    continue
+
+                log.debug(f"Scaling image {self.image_path} to ({width}, {height}).")
+                scaled_image = image.resize(size=(width, height))
 
                 if scaled_image.format == "JPEG":
                     scaled_image.save(output_name, quality="keep")

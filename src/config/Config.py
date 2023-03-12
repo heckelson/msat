@@ -1,3 +1,5 @@
+import logging
+
 config = {
     # this also gets written into when parsing the arguments.
 
@@ -7,3 +9,8 @@ config = {
     "OUTPUT_DB_DIRNAME": "db",
     "OUTPUT_DB_FILENAME": "results.db"
 }
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s [%(levelname)7s] %(name)-10s: %(message)s"
+)

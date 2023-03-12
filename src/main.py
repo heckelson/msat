@@ -1,4 +1,4 @@
-import logging
+import os
 import queue
 import shutil
 from argparse import ArgumentParser
@@ -8,9 +8,8 @@ from file_utils.filecollection import FileCollection
 from file_utils.utils import create_output_dir_if_needed
 from tasking.ImageScaleTask import ImageScaleTask
 from tasking.ImageSizeReportTask import ImageSizeReportTask
+from tasking.ParallelTask import ParallelTask
 from tasking.TaskQueue import TaskQueue
-
-logging.basicConfig(level=logging.DEBUG)
 
 
 def parse_args():
@@ -49,7 +48,11 @@ def main():
         return
 
     files = FileCollection(args.mediadir).keep_relevant_files()
+
+    # set up dir structure for the outputs
     create_output_dir_if_needed(args.outputdir)
+    create_output_dir_if_needed(f"{args.outputdir}{os.sep}"
+                                f"{config.get('OUTPUT_MEDIA_DIRNAME')}")
 
     task_queue = TaskQueue()
 
@@ -61,10 +64,14 @@ def main():
         (200, 200)
     ]
 
-    for file in files:
-        task_queue.put(ImageScaleTask(file, target_resolutions))
+    task_queue.put(ParallelTask([
+        ImageScaleTask(file, target_resolutions) for file in files
+    ]))
 
-    task_queue.put(ImageSizeReportTask(args.outputdir))
+    generated_files = FileCollection(f"{args.outputdir}{os.sep}"
+                                     f"{config.get('OUTPUT_MEDIA_DIRNAME')}")
+
+    task_queue.put(ImageSizeReportTask(generated_files))
 
     try:
         while task := task_queue.get():

@@ -22,10 +22,13 @@ class ImageSizeReportTask(Task):
         │   ├── 400x400.png
         ...
 
+    So the files have the path format:
+    <output_dir>/<media_out_dir>/<hash>/<width>x<height>.<type>
+
     """
 
-    def __init__(self, image_collection_path: str):
-        print(os.listdir('./src/config'))
+    def __init__(self, directory: str):
+        print(os.listdir('./out/generated_media'))
 
     def run(self):
         pass  # TODO
