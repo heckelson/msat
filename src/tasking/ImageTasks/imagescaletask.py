@@ -3,7 +3,7 @@ import os
 
 from PIL import Image
 
-from config.config import config
+from config import config
 from file_utils.utils import sha256hash, create_output_dir_if_needed
 from tasking.task import Task
 

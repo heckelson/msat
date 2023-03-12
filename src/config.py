@@ -1,9 +1,12 @@
 import logging
 
-config = {
-    # this also gets written into when parsing the arguments.
+# TODO: Replace this with a better suited data structure
 
-    # TODO: Update when output_dir is set to avoid code duplication.
+config = {
+    # this gets written into when parsing the arguments.
+    "outputdir": None,
+    "FULL_OUTPUT_MEDIA_DIR": None,
+
     "OUTPUT_MEDIA_DIRNAME": "generated_media",
 
     "OUTPUT_DB_DIRNAME": "db",

@@ -1,13 +1,13 @@
 import os
 import queue
-import shutil
 from argparse import ArgumentParser
 
-from config.config import config
+from config import config
 from file_utils.filecollection import FileCollection
 from file_utils.utils import create_output_dir_if_needed
-from tasking.ImageTasks.imagescaletask import ImageScaleTask
-from tasking.ImageTasks.imagesizereporttask import ImageSizeReportTask
+from tasking import CleanupTask
+from tasking.ImageTasks import ImageScaleTask
+from tasking.ImageTasks import ImageSizeReportTask
 from tasking.paralleltask import ParallelTask
 from tasking.taskqueue import TaskQueue
 
@@ -42,16 +42,17 @@ def main():
     config.update(**args.__dict__)
 
     if args.clean:
-        # if we have the "clean" argument set, remove the output dir and do
-        # nothing else.
-        shutil.rmtree(args.outputdir)
+        CleanupTask(config.get('outputdir')).run()
+
         return
 
-    generated_media_dir = f"{args.outputdir}{os.sep}{config.get('OUTPUT_MEDIA_DIRNAME')}"
+    full_output_media_dir = f"{args.outputdir}{os.sep}{config.get('OUTPUT_MEDIA_DIRNAME')}"
+
+    config['FULL_OUTPUT_MEDIA_DIR'] = full_output_media_dir
 
     # set up dir structure for the outputs
-    create_output_dir_if_needed(args.outputdir)
-    create_output_dir_if_needed(generated_media_dir)
+    create_output_dir_if_needed(config.get('outputdir'))
+    create_output_dir_if_needed(config.get('FULL_OUTPUT_MEDIA_DIR'))
 
     task_queue = TaskQueue()
 
@@ -68,7 +69,7 @@ def main():
         ImageScaleTask(file, target_resolutions) for file in files
     ]))
 
-    task_queue.put(ImageSizeReportTask(generated_media_dir))
+    task_queue.put(ImageSizeReportTask(full_output_media_dir))
 
     try:
         while task := task_queue.get():
