@@ -13,7 +13,9 @@ config = {
     "OUTPUT_DB_FILENAME": "results.db"
 }
 
-logging.basicConfig(
-    level=logging.DEBUG,
-    format="%(asctime)s [%(levelname)7s] %(name)-10s: %(message)s"
-)
+
+def configure_logger():
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format="%(asctime)s [%(levelname)7s] %(name)-10s: %(message)s"
+    )

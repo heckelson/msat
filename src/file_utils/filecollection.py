@@ -1,9 +1,13 @@
+import logging as log
 import os
+
+log = log.getLogger(__name__)
 
 
 class FileCollection:
     def __init__(self, starting_dir: str):
         self.__file_list = self.__collect_filenames_in_dir(starting_dir)
+        self.__n = 0
 
     def __iter__(self):
         self.__n = 0
@@ -17,8 +21,12 @@ class FileCollection:
         else:
             raise StopIteration
 
+    def __len__(self):
+        return self.__file_list.__len__()
+
     @staticmethod
     def from_filename_list(filename_list: list[str]) -> "FileCollection":
+        """Create a temporary file collection, """
         collection = FileCollection('.')
         collection.__file_list = filename_list
         return collection

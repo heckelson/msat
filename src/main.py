@@ -1,81 +1,100 @@
-import os
-import queue
-from argparse import ArgumentParser
+"""
+msat - The Multimedia Storage Analysis Toolkit
+===
 
-from config import config
+This program consists of a couple of distinct stages.
+
+1. Normalization Stage
+
+In the first stage, input images are read from disk and normalized,
+which creates the following images:
+* 24-bit full RGB (no chroma subsampling)
+* 1500x1500 px
+
+2. Processing Stage
+
+Creation of Resampled images for analysis
+
+This step is a bit interwoven with the 3rd step, however there should
+be some tasks available for each image in the pipeline:
+
+* Downsizing using NN, Bilinear, Bicubic, and some more!
+* Upsizing using NN, Bilinear, Bicubic, and some more!
+* Color spaces; YCrCb, and different chroma subsampling ratios
+* Image aware scaling methods?
+
+3. Analysis Stage
+
+Analysis of the created images
+
+The images shall be analyzed according to different parameters, the storage
+space is the first parameter we're investigating.
+
+4. Report Generation
+
+From all the analysis information, a report shall be generated (1) showing
+some statistics, graphics, etc. and (2) the data shall be exported in a
+standard data exchange format (i.e., JSON). This allows for easy further analysis
+in some other context, most likely a Jupyter notebook.
+
+"""
+
+import logging
+
+from config import configure_logger
 from file_utils.filecollection import FileCollection
-from file_utils.utils import create_output_dir_if_needed
-from tasking import CleanupTask
-from tasking.ImageTasks import ImageScaleTask
-from tasking.ImageTasks import ImageSizeReportTask
-from tasking.paralleltask import ParallelTask
-from tasking.taskqueue import TaskQueue
+from file_utils.utils import mkdir_p
+from image_utils.image_normalization import NormalizedImage
 
+configure_logger()
 
-def parse_args():
-    parser = ArgumentParser()
-    parser.add_argument('-r', '--replace',
-                        action="store_true",
-                        help="Replace existing files in the file system as well as "
-                             "database entries, if applicable. Basically redoes all "
-                             "the work.")
-
-    parser.add_argument('-m', '--mediadir',
-                        default='./media',
-                        help="Override the directory in which the source media is "
-                             "located (Default: './media')")
-
-    parser.add_argument('-o', '--outputdir',
-                        default='./out',
-                        help="Override the output directory for files created by "
-                             "the program (SQLite DB, working files, etc.).")
-
-    parser.add_argument('-c', '--clean',
-                        action="store_true",
-                        help="Clean out the output directory.")
-
-    return parser.parse_args()
+log = logging.getLogger(__name__)
 
 
 def main():
-    args = parse_args()
-    config.update(**args.__dict__)
+    """Main function"""
+    setup_directories()
 
-    if args.clean:
-        CleanupTask(config.get('outputdir')).run()
+    # collect files from input folder
+    files = FileCollection("./media")
+    files = files.keep_relevant_files()
 
-        return
+    start_normalization_stage(files)
+    start_processing_stage(files)
+    start_analysis_stage(files)
+    start_report_stage(files)
 
-    full_output_media_dir = f"{args.outputdir}{os.sep}{config.get('OUTPUT_MEDIA_DIRNAME')}"
 
-    config['FULL_OUTPUT_MEDIA_DIR'] = full_output_media_dir
+def setup_directories():
+    """
+    Create needed directories to work in.
+    """
+    # temporary working files
+    mkdir_p("./tmp")
 
-    # set up dir structure for the outputs
-    create_output_dir_if_needed(config.get('outputdir'))
-    create_output_dir_if_needed(config.get('FULL_OUTPUT_MEDIA_DIR'))
+    # output for reports etc.
+    mkdir_p("./out")
 
-    task_queue = TaskQueue()
 
-    target_resolutions = [
-        (1000, 1000),
-        (800, 800),
-        (600, 600),
-        (400, 400),
-        (200, 200)
-    ]
+def start_normalization_stage(image_files: FileCollection):
+    log.info(f"Starting normalization stage on {len(image_files)} files.")
 
-    files = FileCollection(args.mediadir).keep_relevant_files()
-    task_queue.put(ParallelTask([
-        ImageScaleTask(file, target_resolutions) for file in files
-    ]))
+    mkdir_p("./tmp/normalized")
 
-    task_queue.put(ImageSizeReportTask(full_output_media_dir))
+    for i, image in enumerate(image_files):
+        NormalizedImage(image)
 
-    try:
-        while task := task_queue.get():
-            task.run()
-    except queue.Empty:
-        pass
+
+def start_processing_stage(files: FileCollection):
+    log.info(f"Starting processing stage on {len(files)} files.")
+
+
+def start_analysis_stage(files: FileCollection):
+    log.info(f"Starting analysis stage on {len(files)} files.")
+
+
+def start_report_stage(files: FileCollection):
+    log.info(f"Starting reporting stage on {len(files)} files.")
 
 
 if __name__ == '__main__':

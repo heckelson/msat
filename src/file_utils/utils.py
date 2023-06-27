@@ -2,7 +2,7 @@ import hashlib
 import os
 
 
-def create_output_dir_if_needed(output_path: str = None):
+def mkdir_p(output_path: str = None):
     if output_path is None:
         raise ValueError("Output path cannot be None!")
 

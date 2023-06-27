@@ -1,13 +1,11 @@
-import logging
+import logging as log
 import os
 
 from PIL import Image
 
 from config import config
-from file_utils.utils import sha256hash, create_output_dir_if_needed
+from file_utils.utils import sha256hash, mkdir_p
 from tasking.task import Task
-
-log = logging.getLogger(__name__)
 
 
 class ImageScaleTask(Task):
@@ -32,12 +30,12 @@ class ImageScaleTask(Task):
         # create the right folder structure
         media_dir = f"{config.get('outputdir')}" \
                     f"{os.sep}{config.get('OUTPUT_MEDIA_DIRNAME')}"
-        create_output_dir_if_needed(media_dir)
+        mkdir_p(media_dir)
 
         # calculate an image's hash, creating a folder for each unique hash.
         file_hash = sha256hash(self.image_path)
         unique_folder_location = f"{media_dir}{os.sep}{file_hash}"
-        create_output_dir_if_needed(unique_folder_location)
+        mkdir_p(unique_folder_location)
 
         # if everything is set, we can start working now!
         with Image.open(self.image_path) as image:
