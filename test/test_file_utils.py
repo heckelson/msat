@@ -1,13 +1,13 @@
 import subprocess
 import unittest
 
-from file_utils.filecollection import FileCollection
+from file_utils.filepathcollection import FilepathCollection
 from file_utils.utils import sha256hash
 
 
 class FileUtilsTests(unittest.TestCase):
     def setUp(self) -> None:
-        self.files = FileCollection(starting_dir='../media')
+        self.files = FilepathCollection(starting_dir='../media')
 
     def test_sha256_matches(self):
         # compare to the Linux impl of sha256

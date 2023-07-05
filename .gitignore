@@ -6,3 +6,9 @@ out/
 # huge images. it contains the contents of the
 # SRC folder of the SAMPLING archive
 media/testimages.org/
+
+# temporary files
+tmp/
+
+# IDEA stuff
+.idea/

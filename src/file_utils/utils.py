@@ -18,3 +18,11 @@ def sha256hash(filename: str) -> str:
             h.update(chunk)
 
         return h.hexdigest()
+
+
+def get_folder_path(filename: str) -> str:
+    return os.sep.join(filename.split(os.sep)[:-1])
+
+
+def get_only_filename(filename: str) -> str:
+    return filename.split(os.sep)[-1]

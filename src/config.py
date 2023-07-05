@@ -1,21 +1,19 @@
 import logging
+import sys
 
-# TODO: Replace this with a better suited data structure
+IMAGE_FILE_ENDINGS = (
+    '.jpeg',
+    '.jpg',
+    '.png'
+)
 
-config = {
-    # this gets written into when parsing the arguments.
-    "outputdir": None,
-    "FULL_OUTPUT_MEDIA_DIR": None,
-
-    "OUTPUT_MEDIA_DIRNAME": "generated_media",
-
-    "OUTPUT_DB_DIRNAME": "db",
-    "OUTPUT_DB_FILENAME": "results.db"
-}
+NORMALIZATION_RESOLUTION = (1000, 1000)
+NORMALIZED_IMAGE_OUTPUT_DIR_NAME = "tmp/normalized"
 
 
 def configure_logger():
     logging.basicConfig(
         level=logging.DEBUG,
-        format="%(asctime)s [%(levelname)7s] %(name)-10s: %(message)s"
+        format="%(asctime)s [%(levelname)7s] %(name)-10s: %(message)s",
+        stream=sys.stdout
     )

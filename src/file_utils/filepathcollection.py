@@ -4,7 +4,7 @@ import os
 log = log.getLogger(__name__)
 
 
-class FileCollection:
+class FilepathCollection:
     def __init__(self, starting_dir: str):
         self.__file_list = self.__collect_filenames_in_dir(starting_dir)
         self.__n = 0
@@ -25,9 +25,9 @@ class FileCollection:
         return self.__file_list.__len__()
 
     @staticmethod
-    def from_filename_list(filename_list: list[str]) -> "FileCollection":
+    def from_filename_list(filename_list: list[str]) -> "FilepathCollection":
         """Create a temporary file collection, """
-        collection = FileCollection('.')
+        collection = FilepathCollection('.')
         collection.__file_list = filename_list
         return collection
 
@@ -64,7 +64,7 @@ class FileCollection:
 
     def keep_relevant_files(self,
                             override_file_endings:
-                            tuple[str] = None) -> "FileCollection":
+                            tuple[str] = None) -> "FilepathCollection":
         """
         Filters filenames according to their file endings.
         One can optionally pass a tuple of file endings to override the default endings,
@@ -80,7 +80,7 @@ class FileCollection:
             lambda file: file.lower().endswith(override_file_endings), self.__file_list))
 
         # return a new object
-        new_collection = FileCollection.from_filename_list(filtered_files)
+        new_collection = FilepathCollection.from_filename_list(filtered_files)
         return new_collection
 
     def __repr__(self):

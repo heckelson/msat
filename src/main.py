@@ -9,13 +9,14 @@ This program consists of a couple of distinct stages.
 In the first stage, input images are read from disk and normalized,
 which creates the following images:
 * 24-bit full RGB (no chroma subsampling)
-* 1500x1500 px
+* 1000x1000 px
+* most likely PNG format
 
 2. Processing Stage
 
 Creation of Resampled images for analysis
 
-This step is a bit interwoven with the 3rd step, however there should
+This step is interwoven with the 3rd step, however there should
 be some tasks available for each image in the pipeline:
 
 * Downsizing using NN, Bilinear, Bicubic, and some more!
@@ -42,9 +43,10 @@ in some other context, most likely a Jupyter notebook.
 import logging
 
 from config import configure_logger
-from file_utils.filecollection import FileCollection
+from file_utils.filepathcollection import FilepathCollection
 from file_utils.utils import mkdir_p
-from image_utils.image_normalization import NormalizedImage
+from model.ImageFile import ImageFile
+from model.NormalizedImage import NormalizedImage
 
 configure_logger()
 
@@ -56,13 +58,13 @@ def main():
     setup_directories()
 
     # collect files from input folder
-    files = FileCollection("./media")
-    files = files.keep_relevant_files()
+    filepaths = FilepathCollection("./media")
+    filepaths = filepaths.keep_relevant_files()
 
-    start_normalization_stage(files)
-    start_processing_stage(files)
-    start_analysis_stage(files)
-    start_report_stage(files)
+    start_normalization_stage(filepaths)
+    start_processing_stage(filepaths)
+    start_analysis_stage(filepaths)
+    start_report_stage(filepaths)
 
 
 def setup_directories():
@@ -76,24 +78,26 @@ def setup_directories():
     mkdir_p("./out")
 
 
-def start_normalization_stage(image_files: FileCollection):
+def start_normalization_stage(image_files: FilepathCollection):
     log.info(f"Starting normalization stage on {len(image_files)} files.")
 
     mkdir_p("./tmp/normalized")
 
-    for i, image in enumerate(image_files):
+    images = [ImageFile(image_path) for image_path in image_files]
+
+    for image in images:
         NormalizedImage(image)
 
 
-def start_processing_stage(files: FileCollection):
+def start_processing_stage(files: FilepathCollection):
     log.info(f"Starting processing stage on {len(files)} files.")
 
 
-def start_analysis_stage(files: FileCollection):
+def start_analysis_stage(files: FilepathCollection):
     log.info(f"Starting analysis stage on {len(files)} files.")
 
 
-def start_report_stage(files: FileCollection):
+def start_report_stage(files: FilepathCollection):
     log.info(f"Starting reporting stage on {len(files)} files.")
 
 
