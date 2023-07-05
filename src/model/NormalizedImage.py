@@ -27,9 +27,7 @@ class NormalizedImage:
     def __init__(self, image_file: ImageFile):
         # set the file paths and image data
         self.original_filename = image_file.filename
-        self.export_filename = f"{NORMALIZED_IMAGE_OUTPUT_DIR_NAME}{os.sep}{self.original_filename}"
-        self.export_filename = self.export_filename.replace(f"{os.sep}.{os.sep}", os.sep)
-
+        self.__determine_export_filename()
         self.image = image_file.image
 
         log.info(f"Normalizing image `{self.original_filename}`")
@@ -37,7 +35,16 @@ class NormalizedImage:
 
         # do the operations
         self.__crop_image_to_target()
-        self.__standardize_color_format()
+        self.__standardize_format()
+
+    def __determine_export_filename(self):
+        filepath_without_ending = ".".join(
+            self.original_filename.split(".")[:-1])
+
+        self.export_filename = f"{NORMALIZED_IMAGE_OUTPUT_DIR_NAME}" \
+                               f"{os.sep}" \
+                               f"{filepath_without_ending}.png"
+        self.export_filename = self.export_filename.replace(f"{os.sep}.{os.sep}", os.sep)
 
     def __crop_image_to_target(self):
         """
@@ -78,9 +85,21 @@ class NormalizedImage:
         # actually crop the image.
         self.image = self.image.crop((min_x, min_y, max_x, max_y))
 
-    def __standardize_color_format(self):
-        folder_name = get_folder_path(self.export_filename)
+    def __standardize_format(self):
+        """
+        Converts the images to 3x8 RGB images.
 
+        As per the Pillow documentation, "Pillow doesn’t yet support
+        multichannel images with a depth of more than 8 bits per channel",
+        hence this choice.
+        """
+
+        # "RGB" is the 3x8 color mode.
+        if self.image.mode != "RGB":
+            self.image = self.image.convert(mode="RGB")
+
+        # create folder if necessary
+        folder_name = get_folder_path(self.export_filename)
         mkdir_p(folder_name)
 
-        self.image.save(self.export_filename)
+        self.image.save(self.export_filename, mode="RGB")
