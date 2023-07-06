@@ -12,3 +12,6 @@ tmp/
 
 # IDEA stuff
 .idea/
+
+# jupyter stuff
+*/**/.ipynb_checkpoints/

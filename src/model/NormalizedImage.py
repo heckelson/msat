@@ -1,5 +1,6 @@
 import logging
 import os
+from typing import Self
 
 from PIL.Image import Image
 
@@ -30,12 +31,12 @@ class NormalizedImage:
         self.__determine_export_filename()
         self.image = image_file.image
 
-        log.info(f"Normalizing image `{self.original_filename}`")
+    def calculate(self) -> Self:
+        log.debug(f"Normalizing image `{self.original_filename}`")
         log.debug(f"File output: `{self.export_filename}`")
-
-        # do the operations
-        self.__crop_image_to_target()
-        self.__standardize_format()
+        self.__crop_image_to_target_resolution()
+        self.__standardize_format_and_write_to_disk()
+        return self
 
     def __determine_export_filename(self):
         filepath_without_ending = ".".join(
@@ -46,7 +47,7 @@ class NormalizedImage:
                                f"{filepath_without_ending}.png"
         self.export_filename = self.export_filename.replace(f"{os.sep}.{os.sep}", os.sep)
 
-    def __crop_image_to_target(self):
+    def __crop_image_to_target_resolution(self):
         """
         Crops the image to the resolution specified in NORMALIZATION_RESOLUTION.
 
@@ -55,8 +56,8 @@ class NormalizedImage:
         width = self.image.width
         height = self.image.height
 
-        target_x = NORMALIZATION_RESOLUTION[0]
-        target_y = NORMALIZATION_RESOLUTION[1]
+        target_x = NORMALIZATION_RESOLUTION.x
+        target_y = NORMALIZATION_RESOLUTION.y
 
         if width < target_x or height < target_y:
             raise ImageTooSmallException(f"Image is too small. "
@@ -85,9 +86,9 @@ class NormalizedImage:
         # actually crop the image.
         self.image = self.image.crop((min_x, min_y, max_x, max_y))
 
-    def __standardize_format(self):
+    def __standardize_format_and_write_to_disk(self):
         """
-        Converts the images to 3x8 RGB images.
+        Converts the images to 3x8bpp RGB images. We also strip the alpha channel.
 
         As per the Pillow documentation, "Pillow doesn’t yet support
         multichannel images with a depth of more than 8 bits per channel",

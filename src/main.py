@@ -42,9 +42,10 @@ in some other context, most likely a Jupyter notebook.
 
 import logging
 
-from config import configure_logger
+from config import configure_logger, ANALYSIS_CONFIGURATIONS
 from file_utils.filepathcollection import FilepathCollection
 from file_utils.utils import mkdir_p
+from model.AnalysisImage import AnalysisImage
 from model.ImageFile import ImageFile
 from model.NormalizedImage import NormalizedImage
 
@@ -61,8 +62,8 @@ def main():
     filepaths = FilepathCollection("./media")
     filepaths = filepaths.keep_relevant_files()
 
-    start_normalization_stage(filepaths)
-    start_processing_stage(filepaths)
+    normalized_images = start_normalization_stage(filepaths)
+    analysis_images = start_processing_stage(normalized_images)
     start_analysis_stage(filepaths)
     start_report_stage(filepaths)
 
@@ -80,21 +81,21 @@ def setup_directories():
 
 def start_normalization_stage(image_files: FilepathCollection):
     log.info(f"Starting normalization stage on {len(image_files)} files.")
-
     mkdir_p("./tmp/normalized")
 
     images = [ImageFile(image_path) for image_path in image_files]
-
-    for image in images:
-        NormalizedImage(image)
+    return [NormalizedImage(image).calculate() for image in images]
 
 
-def start_processing_stage(files: FilepathCollection):
-    log.info(f"Starting processing stage on {len(files)} files.")
+def start_processing_stage(normalized_images: list[NormalizedImage]):
+    log.info(f"Starting processing stage on {len(normalized_images)} files.")
+
+    return [AnalysisImage(image, ANALYSIS_CONFIGURATIONS).calculate()
+            for image in normalized_images]
 
 
-def start_analysis_stage(files: FilepathCollection):
-    log.info(f"Starting analysis stage on {len(files)} files.")
+def start_analysis_stage(analysis_images: list[AnalysisImage]):
+    log.info(f"Starting analysis stage on {len(analysis_images)} files.")
 
 
 def start_report_stage(files: FilepathCollection):

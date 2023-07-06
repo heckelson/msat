@@ -7,7 +7,7 @@ def mkdir_p(output_path: str = None):
         raise ValueError("Output path cannot be None!")
 
     if not os.path.exists(output_path):
-        os.mkdir(output_path)
+        os.makedirs(output_path)
 
 
 def sha256hash(filename: str) -> str:

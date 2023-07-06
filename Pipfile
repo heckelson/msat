@@ -5,8 +5,12 @@ name = "pypi"
 
 [packages]
 pillow = "*"
+numpy = "*"
+matplotlib = "*"
 
 [dev-packages]
+jupyter = "*"
+autopep8 = "*"
 
 [requires]
 python_version = "3.11"
